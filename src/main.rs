@@ -1,7 +1,7 @@
 use std::env::{args, current_dir};
 use std::fs::{rename, DirBuilder};
+use std::io;
 use std::path::*;
-use std::process::Command;
 
 fn main() {
     let currentpath = current_dir().unwrap();
@@ -19,17 +19,21 @@ fn main() {
             let _builder = DirBuilder::new().create(&templocation);
             let arg_files: Vec<String> = args().collect();
             for i in &arg_files[1..] {
-                println!("Arg: {}", &i);
-                let mut file_path_src = Path::new(&i);
-                let mut file_path_dst = PathBuf::new();
-                file_path_dst.push(&templocation);
-                file_path_dst.push(&file_path_src.file_name().unwrap());
-                let _move_agent = rename(&file_path_src, &file_path_dst).expect("Failed");
-                
+                let filemover = move_files(&templocation, i);
+                match filemover {
+                    Ok(_) => println!("File {} has been moved", i),
+                    Err(e) => println!("Error Moving {}. {:?}", i, e),
+                }
             }
             break;
         }
-
-        //Build new folder
     }
+}
+
+fn move_files(location_of_folder: &PathBuf, file_to_move: &String) -> Result<(), io::Error> {
+    let file_path_src = Path::new(&file_to_move);
+    let mut file_path_dst = PathBuf::new();
+    file_path_dst.push(&location_of_folder);
+    file_path_dst.push(&file_path_src.file_name().unwrap());
+    rename(&file_path_src, &file_path_dst)
 }
