@@ -2,8 +2,12 @@ use std::env::{args, current_dir};
 use std::fs::{rename, DirBuilder};
 use std::io;
 use std::path::*;
+use std::process::exit;
 
 fn main() {
+    if args().len() < 2{
+        exit(1);
+    }
     let currentpath = current_dir().unwrap();
     let mut index: u32 = 0;
     let foldername = String::from("New Folder");
